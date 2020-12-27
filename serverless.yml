@@ -1,0 +1,30 @@
+service: aws
+useDotenv: true
+plugins:
+  - serverless-dotenv-plugin
+
+provider:
+  name: aws
+  region: us-east-2
+  versionFunctions: false
+  # here we put the layers we want to use
+  layers:
+    # Google Chrome for AWS Lambda as a layer
+    # Make sure you use the latest version depending on the region
+    # https://github.com/shelfio/chrome-aws-lambda-layer
+    - arn:aws:lambda:us-east-2:764866452798:layer:chrome-aws-lambda:20
+  # function parameters
+  runtime: nodejs12.x
+  memorySize: 2048 # recommended
+  timeout: 30
+
+functions:
+  grade-scraper:
+    handler: grade-scraper.handler
+    environment:
+      MOSAIC_USERNAME: ${env:MOSAIC_USERNAME}
+      MOSAIC_PASSWORD: ${env:MOSAIC_PASSWORD}
+      ACCOUNT_SID: ${env:ACCOUNT_SID}
+      AUTH_TOKEN: ${env:AUTH_TOKEN}
+      MAILGUN_APIKEY: ${env:MAILGUN_APIKEY}
+      MAILGUN_DOMAIN: ${env:MAILGUN_DOMAIN}

@@ -1,0 +1,20 @@
+{
+  "name": "aws-grade-scraper",
+  "version": "1.0.0",
+  "description": "",
+  "main": "grade-scraper.js",
+  "scripts": {},
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "chrome-aws-lambda": "^5.5.0",
+    "serverless": "^2.16.0",
+    "serverless-dotenv-plugin": "^3.1.0"
+  },
+  "dependencies": {
+    "mailgun-js": "^0.22.0",
+    "node-fetch": "^2.6.1",
+    "twilio": "^3.54.1"
+  }
+}
