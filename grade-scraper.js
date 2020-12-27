@@ -121,8 +121,8 @@ exports.handler = async event => {
     }
 
     if (newGrades) {
-        // await sendText(textMessage)
-        await sendEmail(emailMessage)
+        await sendText(textMessage)
+        // sendEmail(emailMessage)
     } else {
         console.log('No new grades');
     }
@@ -134,7 +134,7 @@ exports.handler = async event => {
     };        
 };
 
-function sendText(message) {
+async function sendText(message) {
     console.log('Trying to send text.');
     client.messages 
     .create({ 
@@ -158,7 +158,7 @@ function getPosted() {
     .then(x => JSON.parse(x).posted )
 }
 
-function sendEmail(message) {
+async function sendEmail(message) {
     console.log('Trying to send email.');
     const data = {
         from: "Mailgun Sandbox <postmaster@sandbox648df37ad847468ba89cf8934a6003a4.mailgun.org>",
