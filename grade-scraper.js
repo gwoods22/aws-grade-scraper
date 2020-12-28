@@ -8,14 +8,14 @@ const password = process.env.MOSAIC_PASSWORD;
 
 const client = require('twilio')(accountSID, authToken); 
 
-exports.handler = async event => {   
-    const posted = await getPosted();
-    
+exports.handler = async event => {       
     const browser = await chromeLambda.puppeteer.launch({
         args: chromeLambda.args,
         executablePath: await chromeLambda.executablePath,
     });
     const page = await browser.newPage();
+
+    // try first invocations of page to catch the odd aws puppeteer loading issue
     try {
         await page.goto('https://epprd.mcmaster.ca/psp/prepprd/?cmd=login');
     
@@ -70,10 +70,9 @@ exports.handler = async event => {
         visible: true
     });
     await page.click("#okbutton input");
-
-    await page.waitForSelector("#ptifrmtarget")
-
+    
     // get new content iframe
+    await page.waitForSelector("#ptifrmtarget")
     const newTarget = await page.frames().find(f => f.name() === 'TargetContent');
 
     // get raw grade data
@@ -101,6 +100,10 @@ exports.handler = async event => {
         }
     }).join(''))
     .concat(`\n${(new Date).getHours() - 5}:${(new Date).getMinutes()}`)
+    // add time so that each message is unique and twilio doesn't suppress
+    // sending the same text to the same number again and again
+
+    const posted = await getPosted();
 
     // new grade checking
     let newGrades = false
