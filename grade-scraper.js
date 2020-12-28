@@ -1,10 +1,5 @@
 const chromeLambda = require("chrome-aws-lambda");
 const fetch = require("node-fetch")
-const mailgun = require("mailgun-js");
-const mg = mailgun({
-    apiKey: process.env.MAILGUN_APIKEY, 
-    domain: process.env.MAILGUN_DOMAIN
-});
 
 const accountSID = process.env.ACCOUNT_SID
 const authToken = process.env.AUTH_TOKEN
@@ -100,28 +95,12 @@ exports.handler = async event => {
         }
     )); 
 
-    let now = new Date
     let textMessage = "🚨NEW GRADES!!🚨".concat(gradeData.map(x => {
         if (x.length === 6) {
             return '\n' + x[0] + '\t' + x[4]
         }
     }).join(''))
     .concat(`\n${(new Date).getHours() - 5}:${(new Date).getMinutes()}`)
-
-    let emailMessage = gradeData.map(x => {
-        if (x.length === 6) {
-            return  x[0] + '\t' + x[4] + '\n'
-        }
-    })  .join('')
-        .concat(`\nSent at ${
-            // -1 +1 ensures noon is 12 and midnight is 0
-            // -5 for timezone
-            (now.getHours() - 1 - 5) % 12 + 1
-        }:${
-            now.getMinutes()
-        }${
-            now.getHours() > 0 && now.getHours < 13 ? 'am' : 'pm'
-        }`)
 
     // new grade checking
     let newGrades = false
@@ -131,8 +110,8 @@ exports.handler = async event => {
             // check if grade is different than posted.json
             if (gradeData[i][4] !== posted[i]) {
             newGrades = true
+            }
         }
-    }
     }
 
     if (newGrades) {
@@ -166,22 +145,4 @@ function getPosted() {
     return fetch("https://raw.githubusercontent.com/gwoods22/aws-grade-scraper/master/posted.json")
     .then(x => x.text())
     .then(x => JSON.parse(x).posted )
-}
-
-async function sendEmail(message) {
-    console.log('Trying to send email.');
-    const data = {
-        from: "Mailgun Sandbox <postmaster@sandbox648df37ad847468ba89cf8934a6003a4.mailgun.org>",
-        to: "graemewoods202@gmail.com",
-        subject: "🚨NEW GRADES!!🚨",
-        text: message
-    };
-    mg.messages().send(data, function (error, body) {
-        console.log("Email sent");
-        console.log(body);
-        if (error) {
-            console.log("EMAIL ERROR");
-            console.log(Error(error));
-        }
-    });
 }
