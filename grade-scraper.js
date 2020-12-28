@@ -100,17 +100,28 @@ exports.handler = async event => {
         }
     )); 
 
+    let now = new Date
     let textMessage = "🚨NEW GRADES!!🚨".concat(gradeData.map(x => {
         if (x.length === 6) {
             return '\n' + x[0] + '\t' + x[4]
         }
     }).join(''))
+    .concat(`\n${(new Date).getHours() - 5}:${(new Date).getMinutes()}`)
 
     let emailMessage = gradeData.map(x => {
         if (x.length === 6) {
             return  x[0] + '\t' + x[4] + '\n'
         }
-    }).join('')
+    })  .join('')
+        .concat(`\nSent at ${
+            // -1 +1 ensures noon is 12 and midnight is 0
+            // -5 for timezone
+            (now.getHours() - 1 - 5) % 12 + 1
+        }:${
+            now.getMinutes()
+        }${
+            now.getHours() > 0 && now.getHours < 13 ? 'am' : 'pm'
+        }`)
 
     let newGrades = false
 
