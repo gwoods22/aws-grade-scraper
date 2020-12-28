@@ -132,8 +132,21 @@ exports.handler = async event => {
     }
 
     if (newGrades) {
-        await sendText(textMessage)
-        // sendEmail(emailMessage)
+        console.log('Trying to send text.');
+        await client.messages 
+        .create({ 
+            body: textMessage,
+            from: '+16477225710',       
+            to: '+17057940402' 
+        }) 
+        .then(response => {
+            console.log('Text message sent'); 
+            console.log(response.sid); 
+        })
+        .catch((e) => {
+            console.log("TWILIO ERROR");
+            console.log(Error(e));
+        });
     } else {
         console.log('No new grades');
     }
@@ -145,26 +158,8 @@ exports.handler = async event => {
     };        
 };
 
-async function sendText(message) {
-    console.log('Trying to send text.');
-    client.messages 
-    .create({ 
-        body: message, 
-        from: '+16477225710',       
-        to: '+17057940402' 
-    }) 
-    .then(response => {
-        console.log('Text message sent'); 
-        console.log(response.sid); 
-    })
-    .catch((e) => {
-        console.log("TWILIO ERROR");
-        console.log(Error(e));
-    });
-}
-
 function getPosted() {
-    return fetch("https://raw.githubusercontent.com/gwoods22/aws-grade-scraper/master/posted.json?token=AGBTUH37VZR4QYU56RKJPT2756XNO")
+    return fetch("https://raw.githubusercontent.com/gwoods22/aws-grade-scraper/master/posted.json")
     .then(x => x.text())
     .then(x => JSON.parse(x).posted )
 }
