@@ -123,12 +123,16 @@ exports.handler = async event => {
             now.getHours() > 0 && now.getHours < 13 ? 'am' : 'pm'
         }`)
 
+    // new grade checking
     let newGrades = false
-
     for (let i = 0; i < gradeData.length; i++) {
-        if ((gradeData[i].length === 6) !== posted[i]) {
+        // check if grade has been posted
+        if (gradeData[i].length === 6) {
+            // check if grade is different than posted.json
+            if (gradeData[i][4] !== posted[i]) {
             newGrades = true
         }
+    }
     }
 
     if (newGrades) {
