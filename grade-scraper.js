@@ -1,8 +1,8 @@
 const chromeLambda = require("chrome-aws-lambda");
 const fetch = require("node-fetch")
 
-const accountSID = process.env.ACCOUNT_SID
-const authToken = process.env.AUTH_TOKEN
+const accountSID = process.env.TWILIO_ACCOUNT_SID
+const authToken = process.env.TWILIO_AUTH_TOKEN
 const username = process.env.MOSAIC_USERNAME;
 const password = process.env.MOSAIC_PASSWORD;
 
