@@ -148,7 +148,8 @@ exports.handler = async event => {
             .create({ 
                 body: textMessage,
                 from: '+16477225710',       
-                to: '+17057940402' 
+                to: '+17057940402',
+                mediaUrl: screenshot.Location
             }) 
             .then(response => {
                 console.log('Text message sent'); 
