@@ -3,9 +3,6 @@ useDotenv: true
 plugins:
   - serverless-dotenv-plugin
 
-custom:
-  s3Bucket: ${env:S3_BUCKET_NAME}
-
 provider:
   name: aws
   region: us-east-2
@@ -25,7 +22,7 @@ provider:
       Action:
         - s3:PutObject
         - s3:PutObjectAcl
-      Resource: arn:aws:s3:::${self:custom.s3Bucket}/*
+      Resource: arn:aws:s3:::${env:S3_SCREENSHOT_BUCKET}/*
 
 functions:
   grade-scraper:
@@ -36,7 +33,7 @@ functions:
       TWILIO_ACCOUNT_SID: ${env:TWILIO_ACCOUNT_SID}
       TWILIO_AUTH_TOKEN: ${env:TWILIO_AUTH_TOKEN}
       S3_REGION: ${self:provider.region}
-      S3_BUCKET: ${self:custom.s3Bucket}
+      S3_BUCKET: ${env:S3_SCREENSHOT_BUCKET}
 
 resources:
   Resources:
@@ -45,7 +42,7 @@ resources:
       Type: AWS::S3::Bucket
       DeletionPolicy: Delete
       Properties:
-        BucketName: ${self:custom.s3Bucket}
+        BucketName: ${env:S3_SCREENSHOT_BUCKET}
         AccessControl: Private
     # Grant public read-only access to the bucket
     screenshotsBucketPolicy:
@@ -57,6 +54,6 @@ resources:
               Action:
                 - s3:GetObject
               Principal: "*"
-              Resource: arn:aws:s3:::${self:custom.s3Bucket}/*
+              Resource: arn:aws:s3:::${env:S3_SCREENSHOT_BUCKET}/*
         Bucket:
           Ref: screenshotsBucket      

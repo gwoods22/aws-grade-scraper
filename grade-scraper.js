@@ -92,7 +92,7 @@ exports.handler = async event => {
         // upload the image using the current timestamp as filename
         const screenshot = await s3
         .upload({
-            Bucket: process.env.S3_BUCKET,
+            Bucket: process.env.S3_SCREENSHOT_BUCKET,
             Key: `${Date.now()}.png`,
             Body: screenshotBuffer,
             ContentType: "image/png",
