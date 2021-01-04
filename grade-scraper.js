@@ -9,24 +9,20 @@ const password = process.env.MOSAIC_PASSWORD;
 const client = require('twilio')(accountSID, authToken); 
 
 exports.handler = async event => {       
-    const browser = await chromeLambda.puppeteer.launch({
+    var browser, page;
+    try {  
+        browser = await chromeLambda.puppeteer.launch({
         args: chromeLambda.args,
         executablePath: await chromeLambda.executablePath,
     });
-    const page = await browser.newPage();
+        page = await browser.newPage();
+        await page.setDefaultTimeout(15000);
 
-    // try first invocations of page to catch the odd aws puppeteer loading issue
-    try {
         await page.goto('https://epprd.mcmaster.ca/psp/prepprd/?cmd=login');
     
         // username
         await page.waitForSelector("#userid");
         await page.type("#userid", username);
-
-    } catch {
-        console.log("ERROR - Something went wrong loading Chromium")
-        return { errorMessage: "Something went wrong loading Chromium" }
-    }
 
     // password
     await page.waitForSelector("#pwd");
@@ -68,9 +64,7 @@ exports.handler = async event => {
     await target.click("#ACE_width .PSPUSHBUTTON:not(.Left)");
 
     //modal ok button
-    await page.waitForSelector("#okbutton input", {
-        visible: true
-    });
+        await page.waitForSelector("#okbutton input", {visible: true});
     await page.click("#okbutton input");
     
     // get new content iframe
@@ -144,6 +138,34 @@ exports.handler = async event => {
         grades: result,
         text_message: textMessage
     };        
+    } catch (e) {
+        console.log(e.name);
+        console.log(e.message);
+        console.log('Trying to send alert text');
+
+        let textMessage = e.name+'\n'+e.message
+        await client.messages 
+        .create({ 
+            body: textMessage,
+            from: '+16477225710',       
+            to: '+17057940402' 
+        }) 
+        .then(response => {
+            console.log('Text message sent'); 
+            console.log(response.sid); 
+        })
+        .catch((e) => {
+            console.log("TWILIO ERROR");
+            console.log(Error(e));
+        });
+
+        await browser.close()
+        
+        return {
+            error: e.name,
+            message: e.message
+        }
+    }
 };
 
 function getPosted() {
