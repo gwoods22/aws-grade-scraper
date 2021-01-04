@@ -3,6 +3,9 @@ useDotenv: true
 plugins:
   - serverless-dotenv-plugin
 
+custom:
+  s3Bucket: ${env:S3_BUCKET_NAME}
+
 provider:
   name: aws
   region: us-east-2
@@ -15,8 +18,14 @@ provider:
     - arn:aws:lambda:us-east-2:764866452798:layer:chrome-aws-lambda:20
   # function parameters
   runtime: nodejs12.x
-  memorySize: 2048 # recommended
+  memorySize: 2048
   timeout: 30
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - s3:PutObject
+        - s3:PutObjectAcl
+      Resource: arn:aws:s3:::${self:custom.s3Bucket}/*
 
 functions:
   grade-scraper:
@@ -24,5 +33,30 @@ functions:
     environment:
       MOSAIC_USERNAME: ${env:MOSAIC_USERNAME}
       MOSAIC_PASSWORD: ${env:MOSAIC_PASSWORD}
-      ACCOUNT_SID: ${env:TWILIO_ACCOUNT_SID}
-      AUTH_TOKEN: ${env:TWILIO_AUTH_TOKEN}
+      TWILIO_ACCOUNT_SID: ${env:TWILIO_ACCOUNT_SID}
+      TWILIO_AUTH_TOKEN: ${env:TWILIO_AUTH_TOKEN}
+      S3_REGION: ${self:provider.region}
+      S3_BUCKET: ${self:custom.s3Bucket}
+
+resources:
+  Resources:
+    # Bucket where the screenshots are stored
+    screenshotsBucket:
+      Type: AWS::S3::Bucket
+      DeletionPolicy: Delete
+      Properties:
+        BucketName: ${self:custom.s3Bucket}
+        AccessControl: Private
+    # Grant public read-only access to the bucket
+    screenshotsBucketPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        PolicyDocument:
+          Statement:
+            - Effect: Allow
+              Action:
+                - s3:GetObject
+              Principal: "*"
+              Resource: arn:aws:s3:::${self:custom.s3Bucket}/*
+        Bucket:
+          Ref: screenshotsBucket      
