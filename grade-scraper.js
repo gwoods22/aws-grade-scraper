@@ -128,7 +128,7 @@ exports.handler = async event => {
         // add time so that each message is unique and twilio doesn't suppress
         // sending the same text to the same number again and again
 
-    const posted = await getPosted();
+        const posted = await getPosted();
 
         // new grade checking
         let newGrades = false
