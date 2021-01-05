@@ -31,6 +31,14 @@ S3_SCREENSHOT_BUCKET=
 ```
 The `S3_SCREENSHOT_BUCKET` just has to be a unique S3 Bucket name so you could use `aws-dev-serverlessdeploymentbucket-<your name>`
 
+### Fill in `posted.json` with current grades and placeholder strings, in the order they appear on Mosaic
+Example: 
+```
+{
+    "posted": ["A-", "", "", "B"]
+}
+```
+
 #### Deploy!
 Run `sls deploy`
 
