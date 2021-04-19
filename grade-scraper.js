@@ -117,6 +117,16 @@ exports.handler = async event => {
 
         await browser.close()
 
+        const ESToffset = -4;
+        let hours = (new Date).getHours() + ESToffset
+        let timestamp = `\n${
+            hours > 12 ? hours - 12 : hours
+        }:${
+            (new Date).getMinutes()
+        } ${
+            hours > 12 ? 'pm' : 'am'
+        }`
+
         let result = gradeData.map(x => (
             {
                 posted: x.length === 6,
@@ -130,7 +140,7 @@ exports.handler = async event => {
                 return '\n' + x[0] + '\t' + x[4]
             }
         }).join(''))
-        .concat(`\n${(new Date).getHours() - 5}:${(new Date).getMinutes()}`)
+        .concat(timestamp)
         // add time so that each message is unique and twilio doesn't suppress
         // sending the same text to the same number again and again
 
