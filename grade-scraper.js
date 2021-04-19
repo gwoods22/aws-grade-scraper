@@ -41,11 +41,17 @@ exports.handler = async event => {
         await page.waitForSelector(".ps_box-button > span > input")
         await page.click(".ps_box-button > span > input")
 
-        // grades tile
-        await page.waitForSelector(".ps_grid-div.ps_grid-body > div:nth-child(10) > div:nth-child(1) > div", {
-            visible: true
-        });
-        await page.click(".ps_grid-div.ps_grid-body > div:nth-child(10) > div:nth-child(1) > div");
+         // get all tile titles from first page
+         await page.waitForSelector(".ps_box-scrollarea > div:first-child .ps_grid-div.ps_grid-body > div > div:first-child > div > div > span", {visible: true});
+         let titles = await page.$$eval(
+             ".ps_box-scrollarea > div:first-child .ps_grid-div.ps_grid-body > div > div:first-child > div > div > span",
+             options => options.map(option => option.innerText)
+         );
+         
+         let gradesIndex = titles.indexOf('Grades') + 1  
+ 
+         // click grades tile
+         await page.click(`.ps_grid-div.ps_grid-body > div:nth-child(${gradesIndex}) > div:first-child > div`);
 
         // --- Sometimes not needed ---
         // modal ok button
