@@ -7,12 +7,6 @@ provider:
   name: aws
   region: us-east-2
   versionFunctions: false
-  # here we put the layers we want to use
-  layers:
-    # Google Chrome for AWS Lambda as a layer
-    # Make sure you use the latest version depending on the region
-    # https://github.com/shelfio/chrome-aws-lambda-layer
-    - arn:aws:lambda:us-east-2:764866452798:layer:chrome-aws-lambda:20
   # function parameters
   runtime: nodejs12.x
   memorySize: 2048
@@ -27,6 +21,11 @@ provider:
 functions:
   grade-scraper:
     handler: grade-scraper.handler
+    layers:
+      # Google Chrome for AWS Lambda as a layer
+      # Make sure you use the latest version depending on the region
+      # https://github.com/shelfio/chrome-aws-lambda-layer
+      - arn:aws:lambda:us-east-2:764866452798:layer:chrome-aws-lambda:20
     environment:
       MOSAIC_USERNAME: ${env:MOSAIC_USERNAME}
       MOSAIC_PASSWORD: ${env:MOSAIC_PASSWORD}
@@ -34,6 +33,15 @@ functions:
       TWILIO_AUTH_TOKEN: ${env:TWILIO_AUTH_TOKEN}
       S3_REGION: ${self:provider.region}
       S3_BUCKET: ${env:S3_SCREENSHOT_BUCKET}
+  twitterbot:
+    handler: twitterbot.handler
+    layers:
+      - arn:aws:lambda:us-east-2:764866452798:layer:chrome-aws-lambda:20
+    environment:
+      T_CONSUMER_KEY: ${env:T_CONSUMER_KEY}
+      T_CONSUMER_SECRET: ${env:T_CONSUMER_SECRET}
+      T_ACCESS_TOKEN_KEY: ${env:T_ACCESS_TOKEN_KEY}
+      T_ACCESS_TOKEN_SECRET: ${env:T_ACCESS_TOKEN_SECRET}
 
 resources:
   Resources:
