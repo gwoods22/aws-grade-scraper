@@ -52,35 +52,38 @@ exports.handler = async event => {
  
          // click grades tile
          await page.click(`.ps_grid-div.ps_grid-body > div:nth-child(${gradesIndex}) > div:first-child > div`);
-
+ 
         // --- Sometimes not needed ---
         // modal ok button
         await page.waitForSelector("#okbutton input", {visible: true});
         await page.click("#okbutton input");
 
-        //wait for iframe
-        await page.waitForSelector("#ptifrmtarget")
-        await page.waitForTimeout(1000)
+        // // --------- CHANGE TERM START ---------
+        // //wait for iframe
+        // await page.waitForSelector("#ptifrmtarget")
+        // await page.waitForTimeout(1000)
 
-        // get content from iframe
-        const target = await page.frames().find(f => f.name() === 'TargetContent')
+        // // get content from iframe
+        // const target = await page.frames().find(f => f.name() === 'TargetContent')
 
-        // --- Sometimes not needed ---
-        // change term
-        await target.waitForSelector("#ACE_width .PSPUSHBUTTON.Left")
-        await target.click("#ACE_width .PSPUSHBUTTON.Left");   
+        // // --- Sometimes not needed ---
+        // // change term
+        // await target.waitForSelector("#ACE_width .PSPUSHBUTTON.Left")
+        // await target.click("#ACE_width .PSPUSHBUTTON.Left");   
 
-        // fall 2020
-        await target.waitForSelector("#ACE_width > tbody > tr:nth-child(4) table table > tbody > tr:nth-child(3) input");
-        await target.click("#ACE_width > tbody > tr:nth-child(4) table table > tbody > tr:nth-child(3) input");
+        // // fall 2020
+        // await target.waitForSelector("#ACE_width > tbody > tr:nth-child(4) table table > tbody > tr:nth-child(3) input");
+        // await target.click("#ACE_width > tbody > tr:nth-child(4) table table > tbody > tr:nth-child(3) input");
 
-        // submit button
-        await target.waitForSelector("#ACE_width .PSPUSHBUTTON:not(.Left)");
-        await target.click("#ACE_width .PSPUSHBUTTON:not(.Left)");
+        // // submit button
+        // await target.waitForSelector("#ACE_width .PSPUSHBUTTON:not(.Left)");
+        // await target.click("#ACE_width .PSPUSHBUTTON:not(.Left)");
+        // // --------- CHANGE TERM END ---------
 
-        //modal ok button
-        await page.waitForSelector("#okbutton input", {visible: true});
-        await page.click("#okbutton input");
+
+        // //modal ok button
+        // await page.waitForSelector("#okbutton input", {visible: true});
+        // await page.click("#okbutton input");
         
         // get new content iframe
         await page.waitForSelector("#ptifrmtarget")
