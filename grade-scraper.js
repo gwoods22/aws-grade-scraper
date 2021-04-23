@@ -155,6 +155,28 @@ exports.handler = async event => {
         // add time so that each message is unique and twilio doesn't suppress
         // sending the same text to the same number again and again
 
+        // get all screenshots
+        let objects = (await s3.listObjects({
+            Bucket: process.env.S3_SCREENSHOT_BUCKET,
+        }).promise()).Contents;
+
+        // get oldest screenshot
+        objects.sort((x,y) => (
+            x.LastModified < y.LastModified
+        ))
+        oldest = objects[0].Key
+
+        // delete oldest
+        let deletedResponse = await s3.deleteObjects({
+            Bucket: process.env.S3_SCREENSHOT_BUCKET,
+            Delete: {
+                Objects: [{
+                    Key: oldest,
+                }]
+            }
+        }).promise();
+        if (deletedResponse.length > 0) throw deletedResponse[0]
+
         const posted = await getPosted();
 
         // new grade checking
