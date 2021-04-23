@@ -120,16 +120,6 @@ exports.handler = async event => {
 
         await browser.close()
 
-        const ESToffset = -4;
-        let hours = (new Date).getHours() + ESToffset
-        let timestamp = `\n${
-            hours > 12 ? hours - 12 : hours
-        }:${
-            (new Date).getMinutes()
-        } ${
-            hours > 12 ? 'pm' : 'am'
-        }`
-
         let result = gradeData.map(x => (
             {
                 posted: x.length === 6,
@@ -137,6 +127,24 @@ exports.handler = async event => {
                 course: x[0] + " - " + x[1]
             }
         )); 
+
+        // account for EST daylight savings
+        const ESToffset = () => {
+            if (
+                (new Date()).getTimezoneOffset() < 
+                Math.max((new Date(0, 1)).getTimezoneOffset(), (new Date(6, 1)).getTimezoneOffset())
+            ) return -4
+            else return -5
+        }
+
+        let hours = (new Date).getHours() + ESToffset()
+        let timestamp = `\n${
+            hours > 12 ? hours - 12 : hours
+        }:${
+            (new Date).getMinutes()
+        } ${
+            hours > 12 ? 'pm' : 'am'
+        }`
 
         let textMessage = "🚨NEW GRADES!!🚨".concat(gradeData.map(x => {
             if (x.length === 6) {
