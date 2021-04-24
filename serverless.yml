@@ -18,6 +18,9 @@ provider:
         - s3:PutObjectAcl
         - s3:GetObject
         - s3:DeleteObject
+      Resource: arn:aws:s3:::${env:S3_SCREENSHOT_BUCKET}/*
+    - Effect: Allow
+      Action:
         - s3:ListBucket
       Resource: arn:aws:s3:::*
 
