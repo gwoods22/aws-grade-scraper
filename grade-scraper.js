@@ -251,7 +251,7 @@ exports.handler = async event => {
     }
 };
 
-function getPosted() {
+async function getPosted() {
     return fetch("https://raw.githubusercontent.com/gwoods22/aws-grade-scraper/master/posted.json")
     .then(x => x.text())
     .then(x => JSON.parse(x).posted )
