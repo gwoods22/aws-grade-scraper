@@ -152,7 +152,9 @@ exports.handler = async event => {
                 return '\n' + x[0] + '\t' + x[4]
             }
         }).join(''))
-        .concat(timestamp)
+        
+        // ----Removed----
+        // .concat(timestamp)
         // add time so that each message is unique and twilio doesn't suppress
         // sending the same text to the same number again and again
 
