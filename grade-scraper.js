@@ -138,10 +138,11 @@ exports.handler = async event => {
         }
 
         let hours = (new Date).getHours() + ESToffset()
+        let minutes = (new Date).getMinutes()
         let timestamp = `\n${
             hours > 12 ? hours - 12 : hours
         }:${
-            (new Date).getMinutes()
+            minutes < 10 ? '0'+minutes : minutes
         } ${
             hours > 12 ? 'pm' : 'am'
         }`
