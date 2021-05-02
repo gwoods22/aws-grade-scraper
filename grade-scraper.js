@@ -2,8 +2,10 @@ const chromeLambda = require("chrome-aws-lambda");
 const fetch = require("node-fetch")
 // aws-sdk is always preinstalled in AWS Lambda in all Node.js runtimes
 const S3Client = require("aws-sdk/clients/s3");
+const { DynamoDBClient, GetItemCommand, PutItemCommand } = require("@aws-sdk/client-dynamodb");
 
-// create an S3 client
+// create an S3 and Dynamo client
+const dbclient = new DynamoDBClient({ region: process.env.S3_REGION });
 const s3 = new S3Client({ region: process.env.S3_REGION });
 
 const accountSID = process.env.TWILIO_ACCOUNT_SID
@@ -184,6 +186,7 @@ exports.handler = async event => {
 
         // new grade checking
         let newGrades = false
+        let grades = []
         for (let i = 0; i < gradeData.length; i++) {
             // check if grade has been posted
             if (gradeData[i].length === 6) {
@@ -191,10 +194,14 @@ exports.handler = async event => {
                 if (gradeData[i][4] !== posted[i]) {
                 newGrades = true
                 }
+                grades.push(gradeData[i][4])
+            } else {
+                grades.push('')
             }
         }
 
         if (newGrades) {
+            await updatePosted( grades );
             console.log('Trying to send text.');
             await client.messages 
             .create({ 
@@ -222,8 +229,7 @@ exports.handler = async event => {
             screenshot: screenshot.Location
         };  
     } catch (e) {
-        console.log(e.name);
-        console.log(e.message);
+        console.log(e, e.trace);
         console.log('Trying to send alert text');
 
         let textMessage = e.name+'\n'+e.message
@@ -242,17 +248,42 @@ exports.handler = async event => {
             console.log(Error(e));
         });
 
-        await browser.close()
+        if (browser) await browser.close()
 
         return {
-            error: e.name,
-            message: e.message
+            error: e,
+            message: e.message,
+            trace: e.trace
         }
     }
 };
 
 async function getPosted() {
-    return fetch("https://raw.githubusercontent.com/gwoods22/aws-grade-scraper/master/posted.json")
-    .then(x => x.text())
-    .then(x => JSON.parse(x).posted )
+    const params = {
+        TableName: "posted-grades",
+        Key: { id: { N: "0" },  },
+    };
+    const data = await dbclient.send(new GetItemCommand(params));
+
+    return data.Item.grades['L'].map(x => x['S']);
+}
+
+
+async function updatePosted(grades) {
+    let gradesList = grades.map(x => ({
+        S: x
+    }))
+    const params = {
+        TableName: "posted-grades",
+        Item: {
+            id: { N: "0" },
+            grades: { 
+                L: gradesList
+            }
+        },
+    };
+
+    const response = await dbclient.send(new PutItemCommand(params));
+    console.log(response.$metadata);
+    if (response.$metadata.httpStatusCode !== 200) throw new Error('Dynamo Put Item Error')
 }
