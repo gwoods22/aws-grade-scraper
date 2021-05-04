@@ -124,8 +124,8 @@ exports.handler = async event => {
 
         let result = gradeData.map(x => (
             {
-                posted: x.length === 6 || x.length === 5,
-                grade: (x.length === 6 || x.length === 5) ? x[4] : '',
+                posted: x.length >= 5,
+                grade: (x.length >= 5) ? x[4] : '',
                 course: x[0] + " - " + x[1]
             }
         )); 
@@ -150,7 +150,7 @@ exports.handler = async event => {
         }`
 
         let textMessage = "🚨NEW GRADES!!🚨".concat(gradeData.map(x => {
-            if (x.length === 6 || x.length === 5) {
+            if (x.length >= 5) {
                 return '\n' + x[0] + '\t' + x[4]
             }
         }).join(''))
@@ -189,7 +189,7 @@ exports.handler = async event => {
         let grades = []
         for (let i = 0; i < gradeData.length; i++) {
             // check if grade has been posted
-            if (gradeData[i].length === 6 || gradeData[i].length === 5) {
+            if (gradeData[i].length >= 5) {
                 // check if grade is different than posted.json
                 if (gradeData[i][4] !== posted[i]) {
                     newGrades = true
