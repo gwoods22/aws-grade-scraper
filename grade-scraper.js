@@ -16,6 +16,10 @@ const password = process.env.MOSAIC_PASSWORD;
 const client = require('twilio')(accountSID, authToken); 
 
 exports.handler = async event => {     
+    return await scrape()
+}
+
+const scrape = async (retry = false) => {
     var browser, page;
     try {  
         browser = await chromeLambda.puppeteer.launch({
@@ -229,31 +233,37 @@ exports.handler = async event => {
             screenshot: screenshot.Location
         };  
     } catch (e) {
-        console.log(e, e.trace);
-        console.log('Trying to send alert text');
+        if (retry) {
+            console.log(e, e.trace);
+            console.log('Trying to send alert text');
 
-        let textMessage = e.name+'\n'+e.message
-        await client.messages 
-        .create({ 
-            body: textMessage,
-            from: '+16477225710',       
-            to: '+17057940402' 
-        }) 
-        .then(response => {
-            console.log('Text message sent'); 
-            console.log(response.sid); 
-        })
-        .catch((e) => {
-            console.log("TWILIO ERROR");
-            console.log(Error(e));
-        });
+            let textMessage = e.name+'\n'+e.message
+            await client.messages 
+            .create({ 
+                body: textMessage,
+                from: '+16477225710',       
+                to: '+17057940402' 
+            }) 
+            .then(response => {
+                console.log('Text message sent'); 
+                console.log(response.sid); 
+            })
+            .catch((e) => {
+                console.log("TWILIO ERROR");
+                console.log(Error(e));
+            });
 
-        if (browser) await browser.close()
+            if (browser) await browser.close()
 
-        return {
-            error: e,
-            message: e.message,
-            trace: e.trace
+            return {
+                error: e,
+                message: e.message,
+                trace: e.trace
+            }
+        } else {
+            console.log(e, e.trace);
+            console.log('Retrying scrape');
+            return await scrape(true);
         }
     }
 };
