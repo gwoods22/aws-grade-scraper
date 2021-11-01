@@ -1,5 +1,4 @@
 const chromeLambda = require("chrome-aws-lambda");
-const fetch = require("node-fetch")
 // aws-sdk is always preinstalled in AWS Lambda in all Node.js runtimes
 const S3Client = require("aws-sdk/clients/s3");
 const { DynamoDBClient, GetItemCommand, PutItemCommand } = require("@aws-sdk/client-dynamodb");
