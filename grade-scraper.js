@@ -3,6 +3,8 @@ const chromeLambda = require("chrome-aws-lambda");
 const S3Client = require("aws-sdk/clients/s3");
 const { DynamoDBClient, GetItemCommand, PutItemCommand } = require("@aws-sdk/client-dynamodb");
 
+const { termSelector } = require('./config.json')
+
 // create an S3 and Dynamo client
 const dbclient = new DynamoDBClient({ region: process.env.S3_REGION });
 const s3 = new S3Client({ region: process.env.S3_REGION });
@@ -86,8 +88,8 @@ const scrape = async (retry = false) => {
         // await target.click("#ACE_width .PSPUSHBUTTON.Left");   
 
         // winter 2021
-        await target.waitForSelector("#ACE_width > tbody > tr:nth-child(4) table table > tbody > tr:nth-child(2) input");
-        await target.click("#ACE_width > tbody > tr:nth-child(4) table table > tbody > tr:nth-child(2) input");
+        await target.waitForSelector("#ACE_width > tbody > tr:nth-child(4) table table > tbody > tr input");
+        await target.click(`#ACE_width > tbody > tr:nth-child(4) table table > tbody > tr:nth-child(${termSelector}) input`);
         
         // submit button
         await target.waitForSelector("#ACE_width .PSPUSHBUTTON:not(.Left)");
@@ -194,7 +196,7 @@ const scrape = async (retry = false) => {
         for (let i = 0; i < gradeData.length; i++) {
             // check if grade has been posted
             if (gradeData[i].length >= 5) {
-                // check if grade is different than posted.json
+                // check if grade is different than grades in DynamoDB
                 if (gradeData[i][4] !== posted[i]) {
                     newGrades = true
                 }
