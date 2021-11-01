@@ -19,6 +19,15 @@ exports.handler = async event => {
     return await scrape()
 }
 
+// account for EST daylight savings
+const ESToffset = () => {
+    if (
+        (new Date()).getTimezoneOffset() < 
+        Math.max( (new Date(0, 1)).getTimezoneOffset(), (new Date(6, 1)).getTimezoneOffset() )
+    ) return -4
+    else return -5
+}
+
 const scrape = async (retry = false) => {
     var browser, page;
     try {  
@@ -134,15 +143,6 @@ const scrape = async (retry = false) => {
                 course: x[0] + " - " + x[1]
             }
         )); 
-
-        // account for EST daylight savings
-        const ESToffset = () => {
-            if (
-                (new Date()).getTimezoneOffset() < 
-                Math.max((new Date(0, 1)).getTimezoneOffset(), (new Date(6, 1)).getTimezoneOffset())
-            ) return -4
-            else return -5
-        }
 
         let hours = (new Date).getHours() + ESToffset()
         let minutes = (new Date).getMinutes()
