@@ -3,7 +3,7 @@ const chromeLambda = require("chrome-aws-lambda");
 const S3Client = require("aws-sdk/clients/s3");
 const { DynamoDBClient, GetItemCommand, PutItemCommand } = require("@aws-sdk/client-dynamodb");
 
-const { termSelector } = require('./config.json')
+const { firstOK, clickChangeTerm, termSelector, lastOK, screenshotClip } = require('./config.json')
 
 // create an S3 and Dynamo client
 const dbclient = new DynamoDBClient({ region: process.env.S3_REGION });
@@ -69,23 +69,25 @@ const scrape = async (retry = false) => {
          // click grades tile
          await page.click(`.ps_grid-div.ps_grid-body > div:nth-child(${gradesIndex}) > div:first-child > div`);
  
-        // --- Sometimes not needed ---
-        // modal ok button
-        // await page.waitForSelector("#okbutton input", {visible: true});
-        // await page.click("#okbutton input");
+        // modal ok button in front of change term
+        if (firstOK) {
+            await page.waitForSelector("#okbutton input", {visible: true});
+            await page.click("#okbutton input");
+        }
 
         // --------- CHANGE TERM START ---------
-        //wait for iframe
+        // wait for iframe
         await page.waitForSelector("#ptifrmtarget")
         await page.waitForTimeout(1000)
 
         // get content from iframe
         const target = await page.frames().find(f => f.name() === 'TargetContent')
 
-        // // --- Sometimes not needed ---
-        // // Click change term button if it doesn't already pop up
-        // await target.waitForSelector("#ACE_width .PSPUSHBUTTON.Left")
-        // await target.click("#ACE_width .PSPUSHBUTTON.Left");   
+        // click change term button if it doesn't already pop up
+        if (clickChangeTerm) {
+            await target.waitForSelector("#ACE_width .PSPUSHBUTTON.Left")
+            await target.click("#ACE_width .PSPUSHBUTTON.Left");   
+        }
 
         // winter 2021
         await target.waitForSelector("#ACE_width > tbody > tr:nth-child(4) table table > tbody > tr input");
@@ -97,22 +99,19 @@ const scrape = async (retry = false) => {
         // --------- CHANGE TERM END ---------
 
 
-        // //modal ok button
-        // await page.waitForSelector("#okbutton input", {visible: true});
-        // await page.click("#okbutton input");
-        
+        // modal ok button after loading the grades page
+        if (lastOK) {
+            await page.waitForSelector("#okbutton input", {visible: true});
+            await page.click("#okbutton input");
+        }
+
         // get new content iframe
         await page.waitForSelector("#ptifrmtarget")
         await page.waitForTimeout(1000)
         const newTarget = await page.frames().find(f => f.name() === 'TargetContent');
 
         const screenshotBuffer = await page.screenshot({
-            clip: {
-                x: 34,
-                y: 259,
-                width: 631,
-                height: 166
-            }
+            clip: screenshotClip
         })
 
         // upload the image using the current timestamp as filename

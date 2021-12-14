@@ -1,4 +1,18 @@
 {
-    "termSelector": 4,
-    "fallTermSelector": 3
+    "firstOK": false,
+
+    "clickChangeTerm": false,
+
+    "termSelector": 3,
+    "fall_selector": 3,
+    "winter_selector": 4,
+
+    "lastOK": true,
+
+    "screenshotClip": {
+        "x": 34,
+        "y": 259,
+        "width": 631,
+        "height": 141
+    }
 }
