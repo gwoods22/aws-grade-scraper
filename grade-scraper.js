@@ -205,7 +205,11 @@ const scrape = async (retry = false) => {
         }
 
         if (newGrades) {
-            await updatePosted( grades );
+            let updateSuccess = await updatePosted(grades);
+            if (updateSuccess){
+                textMessage = textMessage + '\nPosted grades have been updated.'
+            }
+
             console.log('Trying to send text.');
             await client.messages 
             .create({ 
@@ -296,5 +300,10 @@ async function updatePosted(grades) {
     const response = await dbclient.send(new PutItemCommand(params));
     console.log('Updating table posted-grades');
     console.log(response.$metadata);
-    if (response.$metadata.httpStatusCode !== 200) throw new Error('Dynamo Put Item Error')
+    if (response.$metadata.httpStatusCode === 200) {
+        return true
+    } else {
+        throw new Error('Dynamo Put Item Error')
+        return false
+    }
 }
