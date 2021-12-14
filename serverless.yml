@@ -1,3 +1,5 @@
+org: gwoods22
+app: aws
 service: aws
 useDotenv: true
 plugins:
