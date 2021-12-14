@@ -129,20 +129,19 @@ const scrape = async (retry = false) => {
         const gradeData = await newTarget.evaluate(() => {
             let rows = Array.from(document.querySelectorAll("#ACE_width > tbody > tr:nth-child(8) .PSLEVEL1GRID > tbody > tr")).slice(1)
             return rows.map(el => {
-                let textArr = el.innerText.split('\n');
-                return textArr.filter((el) => /\S/.test(el));
+                let text = el.innerText.split('\n')
+                    .filter((el) => /\S/.test(el));
+                    // filter by only keeping non whitespace
+                
+                return {
+                    posted: text.length >= 5,
+                    grade: (text.length >= 5) ? text[4] : '',
+                    course: text[0] + " - " + text[1]
+                }
             })
         });
 
         await browser.close()
-
-        let result = gradeData.map(x => (
-            {
-                posted: x.length >= 5,
-                grade: (x.length >= 5) ? x[4] : '',
-                course: x[0] + " - " + x[1]
-            }
-        )); 
 
         let hours = (new Date).getHours() + ESToffset()
         let minutes = (new Date).getMinutes()
@@ -155,7 +154,7 @@ const scrape = async (retry = false) => {
         }`
 
         let textMessage = "🚨NEW GRADES!!🚨".concat(gradeData.map(x => {
-            if (x.length >= 5) {
+            if (x.posted) {
                 return '\n' + x[0] + '\t' + x[4]
             }
         }).join(''))
@@ -194,12 +193,12 @@ const scrape = async (retry = false) => {
         let grades = []
         for (let i = 0; i < gradeData.length; i++) {
             // check if grade has been posted
-            if (gradeData[i].length >= 5) {
+            if (gradeData[i].posted) {
                 // check if grade is different than grades in DynamoDB
-                if (gradeData[i][4] !== posted[i]) {
+                if (gradeData[i].grade !== posted[i]) {
                     newGrades = true
                 }
-                grades.push(gradeData[i][4])
+                grades.push(gradeData[i].grade)
             } else {
                 grades.push('')
             }
@@ -229,7 +228,7 @@ const scrape = async (retry = false) => {
         
         return { 
             new: newGrades,
-            grades: result,
+            grades: gradeData,
             text_message: textMessage,
             screenshot: screenshot.Location
         };  
