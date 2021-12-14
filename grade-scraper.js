@@ -202,10 +202,7 @@ const scrape = async (retry = false) => {
         }
 
         if (newGrades) {
-            let updateSuccess = await updatePosted(grades);
-            if (updateSuccess){
-                textMessage = textMessage + '\nPosted grades have been updated.'
-            }
+            await updatePosted(grades);
 
             console.log('Trying to send text.');
             await client.messages 
