@@ -190,7 +190,6 @@ const scrape = async (retry = false) => {
 
         // new grade checking
         let newGrades = false
-        let grades = []
         for (let i = 0; i < gradeData.length; i++) {
             // check if grade has been posted
             if (gradeData[i].posted) {
@@ -198,9 +197,6 @@ const scrape = async (retry = false) => {
                 if (gradeData[i].grade !== posted[i]) {
                     newGrades = true
                 }
-                grades.push(gradeData[i].grade)
-            } else {
-                grades.push('')
             }
         }
 
