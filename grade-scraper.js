@@ -304,6 +304,5 @@ async function updatePosted(grades) {
         return true
     } else {
         throw new Error('Dynamo Put Item Error')
-        return false
     }
 }
