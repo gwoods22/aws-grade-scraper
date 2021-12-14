@@ -295,6 +295,7 @@ async function updatePosted(grades) {
     };
 
     const response = await dbclient.send(new PutItemCommand(params));
+    console.log('Updating table posted-grades');
     console.log(response.$metadata);
     if (response.$metadata.httpStatusCode !== 200) throw new Error('Dynamo Put Item Error')
 }
