@@ -136,7 +136,8 @@ const scrape = async (retry = false) => {
                 return {
                     posted: text.length >= 5,
                     grade: (text.length >= 5) ? text[4] : '',
-                    course: text[0] + " - " + text[1]
+                    course: text[0] + " - " + text[1],
+                    courseCode: text[0]
                 }
             })
         });
