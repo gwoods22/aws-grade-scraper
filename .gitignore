@@ -3,3 +3,7 @@ node_modules/
 .env
 
 .DS_Store
+
+# Serverless SDK
+serverless_sdk/
+s_*
