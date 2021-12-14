@@ -202,7 +202,7 @@ const scrape = async (retry = false) => {
         }
 
         if (newGrades) {
-            await updatePosted(grades);
+            await updatePosted(gradeData);
 
             console.log('Trying to send text.');
             await client.messages 
@@ -273,30 +273,31 @@ async function getPosted() {
     };
     const data = await dbclient.send(new GetItemCommand(params));
 
-    return data.Item.grades['L'].map(x => x['S']);
+    return data.Item.data['L'].map(x => x['S']);
 }
 
 
-async function updatePosted(grades) {
-    let gradesList = grades.map(x => ({
-        S: x
-    }))
-    const params = {
+async function updatePosted(gradeData) {
+    const params = (id, data) => ({
         TableName: "posted-grades",
         Item: {
-            id: { N: "0" },
-            grades: { 
-                L: gradesList
+            id: { N: id.toString() },
+            data: { 
+                L: data.map(x => ({
+                    S: x
+                }))
             }
         },
-    };
+    });
+    let gradeParams = params(0,gradeData.map(x => x.grade));
+    let courseParams = params(1,gradeData.map(x => x.courseCode));
 
-    const response = await dbclient.send(new PutItemCommand(params));
+    const responseGrades = await dbclient.send(new PutItemCommand(gradeParams));
+    if (responseGrades.$metadata.httpStatusCode !== 200) throw new Error('Dynamo grades Put Item Error')
+    
+    const responseCourses = await dbclient.send(new PutItemCommand(courseParams));
+    if (responseCourses.$metadata.httpStatusCode !== 200) throw new Error('Dynamo courses Put Item Error')
+    
     console.log('Updating table posted-grades');
-    console.log(response.$metadata);
-    if (response.$metadata.httpStatusCode === 200) {
-        return true
-    } else {
-        throw new Error('Dynamo Put Item Error')
-    }
+    console.log(responseGrades.$metadata);
 }
