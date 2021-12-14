@@ -83,7 +83,7 @@ const scrape = async (retry = false) => {
         const target = await page.frames().find(f => f.name() === 'TargetContent')
 
         // // --- Sometimes not needed ---
-        // // change term
+        // // Click change term button if it doesn't already pop up
         // await target.waitForSelector("#ACE_width .PSPUSHBUTTON.Left")
         // await target.click("#ACE_width .PSPUSHBUTTON.Left");   
 
