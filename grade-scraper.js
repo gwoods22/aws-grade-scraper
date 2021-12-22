@@ -156,7 +156,7 @@ const scrape = async (retry = false) => {
 
         let textMessage = "🚨NEW GRADES!!🚨".concat(gradeData.map(x => {
             if (x.posted) {
-                return '\n' + x[0] + '\t' + x[4]
+                return '\n' + x.courseCode + '\t' + x.grade
             }
         }).join(''))
         
