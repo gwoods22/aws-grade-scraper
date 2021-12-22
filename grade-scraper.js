@@ -187,7 +187,7 @@ const scrape = async (retry = false) => {
         }).promise();
         if (deletedResponse.length > 0) throw deletedResponse[0]
 
-        const posted = await getPosted();
+        const posted = await getPosted(gradeData.length);
 
         // new grade checking
         let newGrades = false
@@ -196,7 +196,8 @@ const scrape = async (retry = false) => {
             if (gradeData[i].posted) {
                 // check if grade is different than grades in DynamoDB
                 if (gradeData[i].grade !== posted[i]) {
-                    newGrades = true
+                    newGrades = true;
+                    break;
                 }
             }
         }
@@ -266,38 +267,42 @@ const scrape = async (retry = false) => {
     }
 };
 
-async function getPosted() {
-    const params = {
-        TableName: "posted-grades",
-        Key: { id: { N: "0" },  },
-    };
-    const data = await dbclient.send(new GetItemCommand(params));
+async function getPosted(gradeCount) {
+    let posted = Array(gradeCount).fill('')
+    for (let i=0; i<gradeCount; i++) {
+        const params = {
+            TableName: "posted-grades",
+            Key: { id: { N: i.toString() },  },
+        };
+        const data = await dbclient.send(new GetItemCommand(params));
 
-    return data.Item.data['L'].map(x => x['S']);
+        posted[i] = data.Item.grade['S'];
+    }
+    return posted
 }
 
 
 async function updatePosted(gradeData) {
-    const params = (id, data) => ({
+    for (let i=0; i<gradeData.length; i++) {
+        let item = gradeData[i];
+        if (item.posted) { 
+            let params = generateParams(i, item);
+
+            const response = await dbclient.send(new PutItemCommand(params));
+            if (response.$metadata.httpStatusCode !== 200) throw new Error('DynamoDB Put Item Error')
+            
+            console.log(`Updating ${item.courseCode} grade`);
+        }
+    }
+}
+
+function generateParams(id, x) {
+    return {
         TableName: "posted-grades",
         Item: {
             id: { N: id.toString() },
-            data: { 
-                L: data.map(x => ({
-                    S: x
-                }))
-            }
-        },
-    });
-    let gradeParams = params(0,gradeData.map(x => x.grade));
-    let courseParams = params(1,gradeData.map(x => x.courseCode));
-
-    const responseGrades = await dbclient.send(new PutItemCommand(gradeParams));
-    if (responseGrades.$metadata.httpStatusCode !== 200) throw new Error('Dynamo grades Put Item Error')
-    
-    const responseCourses = await dbclient.send(new PutItemCommand(courseParams));
-    if (responseCourses.$metadata.httpStatusCode !== 200) throw new Error('Dynamo courses Put Item Error')
-    
-    console.log('Updating table posted-grades');
-    console.log(responseGrades.$metadata);
-}
+            grade: { S: x.grade },
+            course: { S: x.courseCode },
+        }
+    }
+};
