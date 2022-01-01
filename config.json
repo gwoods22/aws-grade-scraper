@@ -1,7 +1,9 @@
 {
-    "firstOK": false,
+    "firstOK": true,
 
-    "clickChangeTerm": false,
+    "clickChangeTerm": true,
+
+    "selectTerm": true,
 
     "termSelector": 3,
     "fall_selector": 3,
