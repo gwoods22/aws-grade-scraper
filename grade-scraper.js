@@ -116,17 +116,6 @@ const scrape = async (retry = false) => {
             clip: screenshotClip
         })
 
-        // upload the image using the current timestamp as filename
-        const screenshot = await s3
-        .upload({
-            Bucket: process.env.S3_SCREENSHOT_BUCKET,
-            Key: `${Date.now()}.png`,
-            Body: screenshotBuffer,
-            ContentType: "image/png",
-            ACL: "public-read"
-        })
-        .promise();
-
         // get raw grade data
         const gradeData = await newTarget.evaluate(() => {
             let rows = Array.from(document.querySelectorAll("#ACE_width > tbody > tr:nth-child(8) .PSLEVEL1GRID > tbody > tr")).slice(1)
@@ -182,8 +171,22 @@ const scrape = async (retry = false) => {
             }
         }
 
+        let screenshotURL = 'Not uploaded'
+
         if (newGrades) {
             await updatePosted(gradeData);
+
+            // upload the image using the current timestamp as filename
+            const screenshot = await s3
+            .upload({
+                Bucket: process.env.S3_SCREENSHOT_BUCKET,
+                Key: `${Date.now()}.png`,
+                Body: screenshotBuffer,
+                ContentType: "image/png",
+                ACL: "public-read"
+            })
+            .promise();
+            screenshotURL = screenshot.Location;
 
             console.log('Trying to send text.');
             await client.messages 
@@ -191,7 +194,7 @@ const scrape = async (retry = false) => {
                 body: textMessage,
                 from: '+16477225710',       
                 to: '+17057940402',
-                mediaUrl: screenshot.Location
+                mediaUrl: screenshotURL
             }) 
             .then(response => {
                 console.log('Text message sent'); 
@@ -209,7 +212,7 @@ const scrape = async (retry = false) => {
             new: newGrades,
             grades: gradeData,
             text_message: textMessage,
-            screenshot: screenshot.Location
+            screenshot: screenshotURL
         };  
     } catch (e) {
         if (retry) {
