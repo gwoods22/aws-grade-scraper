@@ -3,7 +3,7 @@ const chromeLambda = require("chrome-aws-lambda");
 const S3Client = require("aws-sdk/clients/s3");
 const { DynamoDBClient, GetItemCommand, PutItemCommand } = require("@aws-sdk/client-dynamodb");
 
-const { firstOK, clickChangeTerm, termSelector, lastOK, screenshotClip } = require('./config.json')
+const { firstOK, clickChangeTerm, selectTerm, termSelector, lastOK, screenshotClip } = require('./config.json')
 
 // create an S3 and Dynamo client
 const dbclient = new DynamoDBClient({ region: process.env.S3_REGION });
@@ -89,13 +89,15 @@ const scrape = async (retry = false) => {
             await target.click("#ACE_width .PSPUSHBUTTON.Left");   
         }
 
-        // winter 2021
-        await target.waitForSelector("#ACE_width > tbody > tr:nth-child(4) table table > tbody > tr input");
-        await target.click(`#ACE_width > tbody > tr:nth-child(4) table table > tbody > tr:nth-child(${termSelector}) input`);
-        
-        // submit button
-        await target.waitForSelector("#ACE_width .PSPUSHBUTTON:not(.Left)");
-        await target.click("#ACE_width .PSPUSHBUTTON:not(.Left)");
+        if (selectTerm) {
+            // select term based on config object
+            await target.waitForSelector("#ACE_width > tbody > tr:nth-child(4) table table > tbody > tr:nth-child(3) input");
+            await target.click(`#ACE_width > tbody > tr:nth-child(4) table table > tbody > tr:nth-child(${termSelector}) input`);
+            
+            // submit button
+            await target.waitForSelector("#ACE_width .PSPUSHBUTTON:not(.Left)");
+            await target.click("#ACE_width .PSPUSHBUTTON:not(.Left)");
+        }
         // --------- CHANGE TERM END ---------
 
 
