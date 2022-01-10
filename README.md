@@ -5,10 +5,8 @@ Lambda functions that scrapes McMaster's grade system and sends an SMS when ther
 1. Load Chromium on AWS using `chrome-aws-lambda` package.
 2. Log in to https://mosaic.mcmaster.ca/, navigate to grades page for Fall 2020
 3. Take screenshot and upload to Amazon S3
-4. Parse grades and fetch the `posted.json` file in this repo to check which grades are new*
-5. If there are new grades, send a text with the new grades and a screenshot!
-
-###### *Obviously this isn't the ideal storage method but it allows you to update which grades have been received easily by editing the file on Github from the browser, even on your phone. Since this script could be set to run every 10 min it was important for me to be able to edit that `posted.json` file from my phone so I don't get berrated with texts every 10 minutes. Feel free to improve upon this!
+4. Parse grades and compare with grades in DynamoDB
+5. If there are new grades, update DynamoDB and send a text with the new grades and a screenshot!
 
 ## Note on running locally
 Due to the nature of the puppeteer setup in AWS Lambda, `grade-scraper.js` cannot be run locally in it's current state. If you want to edit or change how the scraping is performed, copy `grade-scraper.js` to a separate js file and simply require puppeteer the usual way:
@@ -28,16 +26,9 @@ MOSAIC_PASSWORD=
 TWILIO_ACCOUNT_SID=
 TWILIO_AUTH_TOKEN=
 S3_SCREENSHOT_BUCKET=
+S3_REGION=
 ```
 The `S3_SCREENSHOT_BUCKET` just has to be a unique S3 Bucket name so you could use `aws-dev-serverlessdeploymentbucket-<your name>`
-
-### Fill in `posted.json` with current grades and placeholder strings, in the order they appear on Mosaic
-Example: 
-```
-{
-    "posted": ["A-", "", "", "B"]
-}
-```
 
 #### Deploy!
 Run `sls deploy`
