@@ -14,8 +14,6 @@
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.14.0",
-    "mailgun-js": "^0.22.0",
-    "twilio": "^3.54.1",
-    "twitter": "^1.7.1"
+    "twilio": "^3.54.1"
   }
 }
