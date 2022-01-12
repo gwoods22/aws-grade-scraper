@@ -48,25 +48,25 @@ functions:
       S3_REGION: ${self:provider.region}
       S3_BUCKET: ${env:S3_SCREENSHOT_BUCKET}
 
-resources:
-  Resources:
-    # Bucket where the screenshots are stored
-    screenshotsBucket:
-      Type: AWS::S3::Bucket
-      DeletionPolicy: Delete
-      Properties:
-        BucketName: ${env:S3_SCREENSHOT_BUCKET}
-        AccessControl: Private
-    # Grant public read-only access to the bucket
-    screenshotsBucketPolicy:
-      Type: AWS::S3::BucketPolicy
-      Properties:
-        PolicyDocument:
-          Statement:
-            - Effect: Allow
-              Action:
-                - s3:GetObject
-              Principal: "*"
-              Resource: arn:aws:s3:::${env:S3_SCREENSHOT_BUCKET}/*
-        Bucket:
-          Ref: screenshotsBucket      
+# resources:
+#   Resources:
+#     # Bucket where the screenshots are stored
+#     screenshotsBucket:
+#       Type: AWS::S3::Bucket
+#       DeletionPolicy: Delete
+#       Properties:
+#         BucketName: ${env:S3_SCREENSHOT_BUCKET}
+#         AccessControl: Private
+#     # Grant public read-only access to the bucket
+#     screenshotsBucketPolicy:
+#       Type: AWS::S3::BucketPolicy
+#       Properties:
+#         PolicyDocument:
+#           Statement:
+#             - Effect: Allow
+#               Action:
+#                 - s3:GetObject
+#               Principal: "*"
+#               Resource: arn:aws:s3:::${env:S3_SCREENSHOT_BUCKET}/*
+#         Bucket:
+#           Ref: screenshotsBucket      
