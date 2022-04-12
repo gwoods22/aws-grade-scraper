@@ -5,11 +5,11 @@
 
     "selectTerm": true,
 
-    "termSelector": 3,
+    "termSelector": 2,
     "fall_selector": 3,
-    "winter_selector": 4,
+    "winter_selector": 2,
 
-    "lastOK": true,
+    "lastOK": false,
 
     "screenshotClip": {
         "x": 34,
