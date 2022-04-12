@@ -145,11 +145,19 @@ const scrape = async (retry = false) => {
             hours > 12 ? 'pm' : 'am'
         }`
 
-        let textMessage = "🚨NEW GRADES!!🚨".concat(gradeData.map(x => {
+        let textMessage = gradeData
+          .map((x) => {
             if (x.posted) {
-                return '\n' + x.courseCode + '\t' + x.grade
+              return "\n" + x.courseCode + "\t" + x.grade;
             }
-        }).join(''))
+          })
+          .join("");
+
+        if (textMessage.length > 0) {
+          textMessage = "🚨NEW GRADES!!🚨" + textMessage;
+        } else {
+          textMessage = "No posted grades.";
+        }
         
         // ----Removed----
         // .concat(timestamp)
