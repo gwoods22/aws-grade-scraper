@@ -7,3 +7,5 @@ node_modules/
 # Serverless SDK
 serverless_sdk/
 s_*
+
+.vscode
