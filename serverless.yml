@@ -13,8 +13,7 @@ provider:
   name: aws
   region: us-east-2
   versionFunctions: false
-  # function parameters
-  runtime: nodejs12.x
+  runtime: nodejs14.x
   memorySize: 2048
   timeout: 30
   iam:
@@ -39,7 +38,7 @@ functions:
       # Google Chrome for AWS Lambda as a layer
       # Make sure you use the latest version depending on the region
       # https://github.com/shelfio/chrome-aws-lambda-layer
-      - arn:aws:lambda:us-east-2:764866452798:layer:chrome-aws-lambda:20
+      - arn:aws:lambda:us-east-2:764866452798:layer:chrome-aws-lambda:25
     environment:
       MOSAIC_USERNAME: ${env:MOSAIC_USERNAME}
       MOSAIC_PASSWORD: ${env:MOSAIC_PASSWORD}
