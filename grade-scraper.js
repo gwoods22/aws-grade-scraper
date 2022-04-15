@@ -16,8 +16,8 @@ const password = process.env.MOSAIC_PASSWORD;
 
 const client = require('twilio')(accountSID, authToken); 
 
-exports.handler = async event => {     
-    return await scrape()
+exports.handler = async (_, context) => {
+    return await scrape(context.clientContext?.refresh);
 }
 
 // account for EST daylight savings
@@ -29,7 +29,7 @@ const ESToffset = () => {
     else return -5
 }
 
-const scrape = async (retry = false) => {
+const scrape = async (refresh = false, retry = false) => {
     var browser, page;
     try {  
         browser = await chromeLambda.puppeteer.launch({
@@ -181,7 +181,7 @@ const scrape = async (retry = false) => {
 
         let screenshotURL = 'Not uploaded'
 
-        if (newGrades) {
+        if (newGrades || refresh) {
             await updatePosted(gradeData);
 
             // upload the image using the current timestamp as filename
@@ -253,7 +253,7 @@ const scrape = async (retry = false) => {
         } else {
             console.log(e, e.trace);
             console.log('Retrying scrape');
-            return await scrape(true);
+            return await scrape(false, true);
         }
     }
 };
