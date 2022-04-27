@@ -156,7 +156,7 @@ const scrape = async (refresh = false, retry = false) => {
         if (textMessage.length > 0) {
           textMessage = "🚨NEW GRADES!!🚨" + textMessage;
         } else {
-          textMessage = "No posted grades.";
+          textMessage = `No posted grades as of ${timestamp}.`;
         }
         
         // ----Removed----
