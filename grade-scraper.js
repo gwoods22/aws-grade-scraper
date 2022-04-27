@@ -16,8 +16,8 @@ const password = process.env.MOSAIC_PASSWORD;
 
 const client = require('twilio')(accountSID, authToken); 
 
-exports.handler = async (_, context) => {
-    return await scrape(context.clientContext?.refresh);
+exports.handler = async (event) => {
+    return await scrape(event?.refresh);
 }
 
 // account for EST daylight savings
