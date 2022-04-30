@@ -22,11 +22,13 @@ exports.handler = async (event) => {
 
 // account for EST daylight savings
 const ESToffset = () => {
-    if (
-        (new Date()).getTimezoneOffset() < 
-        Math.max( (new Date(0, 1)).getTimezoneOffset(), (new Date(6, 1)).getTimezoneOffset() )
-    ) return -4
-    else return -5
+    // winter is EST, -5 offset
+    // summer is EDT, -4 offset
+    let date = new Date();
+    const january = new Date(date.getFullYear(), 0, 1).getTimezoneOffset();
+    const july = new Date(date.getFullYear(), 6, 1).getTimezoneOffset();
+
+    return Math.max(january, july) !== date.getTimezoneOffset() ? -4 : -5;
 }
 
 const scrape = async (refresh = false, retry = false) => {
