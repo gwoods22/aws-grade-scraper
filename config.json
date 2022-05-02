@@ -1,7 +1,7 @@
 {
-    "firstOK": true,
+    "firstOK": false,
 
-    "clickChangeTerm": true,
+    "clickChangeTerm": false,
 
     "selectTerm": true,
 
