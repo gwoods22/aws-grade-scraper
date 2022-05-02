@@ -24,11 +24,9 @@ exports.handler = async (event) => {
 const ESToffset = () => {
     // winter is EST, -5 offset
     // summer is EDT, -4 offset
-    let date = new Date();
-    const january = new Date(date.getFullYear(), 0, 1).getTimezoneOffset();
-    const july = new Date(date.getFullYear(), 6, 1).getTimezoneOffset();
 
-    return Math.max(january, july) !== date.getTimezoneOffset() ? -4 : -5;
+    // approximately Mar begins EDT, Nov begins EST
+    return new Date().getMonth() >= 2 && new Date().getMonth() < 10 ? -4 : -5;
 }
 
 const scrape = async (refresh = false, retry = false) => {
@@ -138,6 +136,7 @@ const scrape = async (refresh = false, retry = false) => {
         await browser.close()
 
         let hours = (new Date).getHours() + ESToffset()
+        if (hours < 0) { hours = hours + 12; }
         let minutes = (new Date).getMinutes()
         let timestamp = `\n${
             hours > 12 ? hours - 12 : hours
